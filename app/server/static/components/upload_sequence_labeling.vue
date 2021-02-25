@@ -16,11 +16,11 @@ block select-format-area
     input(
       type="radio"
       name="format"
-      value="conll"
-      v-bind:checked="format == 'conll'"
+      value="xlsx"
+      v-bind:checked="format == 'xlsx'"
       v-model="format"
     )
-    | CoNLL
+    | EXCEL
 
   label.radio
     input(

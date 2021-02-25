@@ -403,19 +403,43 @@ class TextDownloadAPI(APIView):
             else project.documents.all()
         )
         painter = self.select_painter(format)
-
+        print('here download 2')
         # jsonl-textlabel format prints text labels while jsonl format prints annotations with label ids
         # jsonl-textlabel format - "labels": [[0, 15, "PERSON"], ..]
         # jsonl format - "annotations": [{"label": 5, "start_offset": 0, "end_offset": 2, "user": 1},..]
         if format in ('jsonl', 'txt'):
             labels = project.labels.all()
             data = painter.paint_labels(documents, labels)
+        elif format =='xlsx':
+            labels = project.labels.all()
+
+            ## Custom Code by Raviraj to convert doccano file to <START><END> format data
+            input_data = painter.paint_labels(documents, labels)
+            data = []
+            if input_data:
+                for a in input_data:
+                    text = a['text']
+                    labels = a['labels']
+                    if labels:
+                        first_index = []
+                        for i in labels:
+                            first_index.append(i[0])
+                        sorted_first_index = sorted(first_index, reverse = True)
+                        for index in sorted_first_index:
+                            item = labels[first_index.index(index)]
+                            print(item)
+                            text = text[0:item[1]] + " <END> " + text[item[1]:]
+                            text = text[0:item[0]] + f"<START:{item[2]}> " + text[item[0]:]
+                    data.append(text)
         else:
             data = painter.paint(documents)
+
         return Response(data)
 
     def select_painter(self, format):
         if format == 'csv':
+            return CSVPainter()
+        elif format == 'xlsx':
             return CSVPainter()
         elif format == 'jsonl' or format == 'json':
             return JSONPainter()

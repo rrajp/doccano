@@ -12,6 +12,16 @@ block select-format-area
     )
     | CSV
 
+    label.radio
+    input(
+      type="radio"
+      name="format"
+      value="xlsx"
+      v-bind:checked="format == 'xlsx'"
+      v-model="format"
+    )
+    | EXCEL
+
   label.radio
     input(
       type="radio"
@@ -24,7 +34,12 @@ block select-format-area
 
 block example-format-area
   pre.code-block(v-show="format == 'csv'")
-    code.csv
+    code.cs
+      include ./examples/download_seq2seq.csv
+      | ...
+
+  pre.code-block(v-show="format == 'xlsx'")
+    code.cs
       include ./examples/download_seq2seq.csv
       | ...
 
